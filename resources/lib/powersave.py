@@ -86,7 +86,7 @@ class Main:
 			
 			
 			print "mythtv.powersave: Mark"
-			print self._isRecording
+			print("mythtv.powersave: IsRecording: %s" % self._isRecording)
 
 			# powersave checks ...
 			if (self.settings['vdrps_sleepmode'] > 0) & \
