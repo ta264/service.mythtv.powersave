@@ -74,7 +74,7 @@ class Main:
 			# Otherwise xbmc could sleep instantly at the end of a movie
 			if (self._lastPlaying  == True) & (self._isPlaying == False) & (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
 				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
-				#xbmc.log(msg="mythtv.powersave: playback stopped!", level=xbmc.LOGNOTICE)
+				#xbmc.log(msg="mythtv.powersave: playback stopped!", level=xbmc.LOGDEBUG)
 
 			# notice changes in recording
 			self._lastRecording = self._isRecording
@@ -84,16 +84,16 @@ class Main:
 			if (self._lastRecording  == True) & (self._isRecording == False) & (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
 				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
 
-			xbmc.log(msg="mythtv.powersave: IsRecording: %s" % self._isRecording, level=xbmc.LOGNOTICE)
+			xbmc.log(msg="mythtv.powersave: IsRecording: %s" % self._isRecording, level=xbmc.LOGDEBUG)
 
 			# powersave checks ...
 			if (self.settings['vdrps_sleepmode'] > 0) & \
 			   (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
 				# sleeping time already?
 				if (self._isPlaying):
-					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGNOTICE)
+					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGDEBUG)
 				elif (self._isRecording):
-					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGNOTICE)
+					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGDEBUG)
 				else:
 					if (self.settings['vdrps_sleepmode'] == 1):
 						#xbmc.log(msg="mythtv.powersave: initiating sleepmode S3 ...", level=xbmc.LOGNOTICE)
@@ -115,7 +115,7 @@ class Main:
 		
 	# get settings from xbmc
 	def getSettings(self):
-		xbmc.log(msg="mythtv.powersave: Getting settings ...", level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: Getting settings ...", level=xbmc.LOGDEBUG)
 		self.settings = {}
 		self.settings['vdrps_host'] = Addon.getSetting('vdrps_host')
 		self.settings['vdrps_port'] = int(Addon.getSetting('vdrps_port'))
@@ -129,19 +129,19 @@ class Main:
 
 	# get timers from vdr
 	def getTimers(self):
-		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGDEBUG)
 		self._nextWakeUp = self.getNextWake()
 
-		xbmc.log(msg="mythtv.powersave: Getting shutdown status", level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: Getting shutdown status", level=xbmc.LOGDEBUG)
 		mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		self._mythShutdownStatus=int(mythStatus.stdout.read())
 
-		xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
 
 
 	# set the alarm clock if necessary
 	def setWakeup(self):
-		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGDEBUG)
 		# calculate next wakeup time
 		stampWakeup = self.getMostRecentTimer() - self.settings['vdrps_forerun']
 
@@ -162,7 +162,7 @@ class Main:
 				stampDailyWakeup = stampDateOnly + self.settings['vdrps_dailywakeup_time'] + 86400
 			
 
-			xbmc.log(msg="mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup, level=xbmc.LOGNOTICE)
+			xbmc.log(msg="mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup, level=xbmc.LOGDEBUG)
 				
 			# daily wakeup is before next timer, so set the alarm clock to it
 			if (stampDailyWakeup<stampWakeup) | (stampWakeup < 300000):
@@ -173,10 +173,10 @@ class Main:
 			stampFinalWakeup = stampWakeup
 		
 		# is it in the future and not already set?
-		xbmc.log(msg="mythtv.powersave: next recording: %d" % stampWakeup, level=xbmc.LOGNOTICE)
-		xbmc.log(msg="mythtv.powersave: final wake time: %d" % stampFinalWakeup, level=xbmc.LOGNOTICE)
-		xbmc.log(msg="mythtv.powersave: time now: %d" % stampNow, level=xbmc.LOGNOTICE)
-		xbmc.log(msg="mythtv.powersave: last wake: %d" % self._lastWakeup, level=xbmc.LOGNOTICE)
+		xbmc.log(msg="mythtv.powersave: next recording: %d" % stampWakeup, level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: final wake time: %d" % stampFinalWakeup, level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: time now: %d" % stampNow, level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: last wake: %d" % self._lastWakeup, level=xbmc.LOGDEBUG)
 		if (stampFinalWakeup>stampNow) & (stampFinalWakeup <> self._lastWakeup):
 			# yes we do have to wakeup
 			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %d (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
@@ -185,13 +185,13 @@ class Main:
 			# remember the stamp, not to call alarm script twice with the same value
 			self._lastWakeup = stampFinalWakeup
 		else:
-			xbmc.log(msg="mythtv.powersave: no wake required", level=xbmc.LOGNOTICE)
+			xbmc.log(msg="mythtv.powersave: no wake required", level=xbmc.LOGDEBUG)
 			
 	def getNextWake(self):
 		progs = self._MythBackend.getUpcomingRecordings()
 		try:
 			rectime = progs.next().recstartts
-			xbmc.log(msg="mythtv.powersave: got record time: %s" % rectime, level=xbmc.LOGNOTICE)
+			xbmc.log(msg="mythtv.powersave: got record time: %s" % rectime, level=xbmc.LOGDEBUG)
 			return int(rectime.strftime("%s"))
 		except:
 			return 0
