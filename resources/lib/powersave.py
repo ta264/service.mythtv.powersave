@@ -21,7 +21,6 @@ class Main:
 	_idleTime = 0
 	_lastIdleTime = 0
 	_realIdleTime = 0
-	_isLoggedOn = False
 	_lastPlaying = False
 	_isPlaying = False
 	_lastRecording = False
@@ -72,8 +71,8 @@ class Main:
 			
 			# now this one is tricky: a playback ended, idle would suggest to powersave, but we set the clock back for overrun. 
 			# Otherwise xbmc could sleep instantly at the end of a movie
-			if (self._lastPlaying  == True) & (self._isPlaying == False) & (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
-				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
+			if (self._lastPlaying  == True) & (self._isPlaying == False) & (self._realIdleTime >= self.settings['mythps_sleepmode_after']):
+				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
 				#xbmc.log(msg="mythtv.powersave: playback stopped!", level=xbmc.LOGDEBUG)
 
 			# notice changes in recording
@@ -81,15 +80,15 @@ class Main:
 			self._isRecording = self.getIsRecording()
 
 			# same trick, for recording issues - gives time to postprocess
-			if (self._lastRecording  == True) & (self._isRecording == False) & (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
-				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
+			if (self._lastRecording  == True) & (self._isRecording == False) & (self._realIdleTime >= self.settings['mythps_sleepmode_after']):
+				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
 
 			xbmc.log(msg="mythtv.powersave: IsRecording: %s" % self._isRecording, level=xbmc.LOGDEBUG)
 			xbmc.log(msg="mythtv.powersave: IdleTime: %d" % self._realIdleTime, level=xbmc.LOGDEBUG)
 
 			# powersave checks ...
-			if (self.settings['vdrps_sleepmode'] > 0) & \
-			   (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
+			if (self.settings['mythps_sleepmode'] > 0) & \
+			   (self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				# sleeping time already?
 				if (self._isPlaying):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGDEBUG)
@@ -111,17 +110,17 @@ class Main:
 	def getSettings(self):
 		xbmc.log(msg="mythtv.powersave: Getting settings ...", level=xbmc.LOGDEBUG)
 		self.settings = {}
-		self.settings['vdrps_host'] = Addon.getSetting('vdrps_host')
-		self.settings['vdrps_port'] = int(Addon.getSetting('vdrps_port'))
-		self.settings['vdrps_forerun'] = self._enum_forerun[int(Addon.getSetting('vdrps_forerun'))] * 60
-		self.settings['vdrps_wakecmd'] = Addon.getSetting('vdrps_wakecmd')
-		self.settings['vdrps_overrun'] = self._enum_forerun[int(Addon.getSetting('vdrps_overrun'))] * 60
-		self.settings['vdrps_sleepmode'] = int(Addon.getSetting('vdrps_sleepmode'))
-		self.settings['vdrps_sleepmode_after'] = self._enum_idle[int(Addon.getSetting('vdrps_sleepmode_after'))] * 60
-		self.settings['vdrps_dailywakeup'] = Addon.getSetting('vdrps_dailywakeup')
-		self.settings['vdrps_dailywakeup_time'] = int(Addon.getSetting('vdrps_dailywakeup_time')) * 1800
+		self.settings['mythps_host'] = Addon.getSetting('mythps_host')
+		self.settings['mythps_port'] = int(Addon.getSetting('mythps_port'))
+		self.settings['mythps_forerun'] = self._enum_forerun[int(Addon.getSetting('mythps_forerun'))] * 60
+		self.settings['mythps_wakecmd'] = Addon.getSetting('mythps_wakecmd')
+		self.settings['mythps_overrun'] = self._enum_overrun[int(Addon.getSetting('mythps_overrun'))] * 60
+		self.settings['mythps_sleepmode'] = int(Addon.getSetting('mythps_sleepmode'))
+		self.settings['mythps_sleepmode_after'] = self._enum_idle[int(Addon.getSetting('mythps_sleepmode_after'))] * 60
+		self.settings['mythps_dailywakeup'] = Addon.getSetting('mythps_dailywakeup')
+		self.settings['mythps_dailywakeup_time'] = int(Addon.getSetting('mythps_dailywakeup_time')) * 1800
 
-	# get timers from vdr
+	# get timers from mythtv
 	def getTimers(self):
 		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGDEBUG)
 		# if we have lost the connection to mythbackend, don't try to update the timers.  This should never happen
@@ -140,23 +139,23 @@ class Main:
 	def setWakeup(self):
 		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGDEBUG)
 		# calculate next wakeup time
-		stampWakeup = self.getMostRecentTimer() - self.settings['vdrps_forerun']
+		stampWakeup = self.getMostRecentTimer() - self.settings['mythps_forerun']
 
 		stampNow = int(time.time())
 
 		# some extra calculations for daily wakeing
-		if (self.settings['vdrps_dailywakeup'] == "true"):
+		if (self.settings['mythps_dailywakeup'] == "true"):
 			# extract date and time only
 			tupleNow = time.localtime(stampNow)
 			stampTimeOnly = (tupleNow.tm_hour*3600)+(tupleNow.tm_min*60)+tupleNow.tm_sec
 			stampDateOnly = time.mktime((tupleNow.tm_year,tupleNow.tm_mon,tupleNow.tm_mday,0,0,0,tupleNow.tm_wday,tupleNow.tm_yday,tupleNow.tm_isdst))
 
 			# wake me today, or tomorrow?
-			if (self.settings['vdrps_dailywakeup_time'] > stampTimeOnly):
-				stampDailyWakeup = stampDateOnly + self.settings['vdrps_dailywakeup_time']
+			if (self.settings['mythps_dailywakeup_time'] > stampTimeOnly):
+				stampDailyWakeup = stampDateOnly + self.settings['mythps_dailywakeup_time']
 			else:
 				# add a whole day
-				stampDailyWakeup = stampDateOnly + self.settings['vdrps_dailywakeup_time'] + 86400
+				stampDailyWakeup = stampDateOnly + self.settings['mythps_dailywakeup_time'] + 86400
 			
 
 			xbmc.log(msg="mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup, level=xbmc.LOGDEBUG)
@@ -178,7 +177,7 @@ class Main:
 			# yes we do have to wakeup
 			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %d (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
 			# call the alarm script
-			os.system("%s %d" % (self.settings['vdrps_wakecmd'],stampFinalWakeup))
+			os.system("%s %d" % (self.settings['mythps_wakecmd'],stampFinalWakeup))
 			# remember the stamp, not to call alarm script twice with the same value
 			self._lastWakeup = stampFinalWakeup
 		else:
@@ -215,7 +214,7 @@ class Main:
 		
 		#show dialog box - give chance to abort
 		duration = 60
-		powerFunc = self._enum_powerfunc[self.settings['vdrps_sleepmode']-1]
+		powerFunc = self._enum_powerfunc[self.settings['mythps_sleepmode']-1]
 
 		xbmc.log(msg="mythtv.powersave: creating powersave dialog box for %s" % powerFunc, level=xbmc.LOGDEBUG)
 		pDialog = xbmcgui.DialogProgress()
