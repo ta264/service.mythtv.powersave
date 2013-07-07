@@ -11,8 +11,10 @@ class Main:
 	_enum_forerun = [1,2,5,10,15,20]
 	_enum_overrun = [1,2,5,10,15,20]
 	_enum_idle= [5,10,15,20,25,30,40,50,60,90,120,180,240,300,360,420,480,540,600]
-	_sleep_interval = 10000
-	_poll_interval = 6
+	# reduce sleep time so we don't get caught with our pants down when xbmc tries to exit
+	_sleep_interval = 2 * 1000
+	# poll timers/shutdown status every 60 seconds
+	_poll_interval = 60 * 1000 / _sleep_interval
 	_timers = {}
 	_nextWakeup = 0
 	_lastWakeup = 0
