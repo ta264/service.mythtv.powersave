@@ -6,8 +6,11 @@
   <requires>
     <import addon="xbmc.python" version="1.0" start="login|startup"/>
   </requires>
+  <extension point="xbmc.service" library="default.py"/>
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <summary lang="en">Experimental service to handle powersave and wakeup according to MythTV timers</summary>
-    <description lang="en">This service handles automated powersave and wakeup operations, in cooperation with a VDR backend. In Order to work correctly, its required for your com    </extension>
+    <description lang="en">This service handles automated powersave and wakeup operations, in cooperation with a MythTV backend. In Order to work correctly, its required for your computer to support automated wakeups flawlessly.
+The service also will set your XBMC system into powersave mode, when left idle, unless playing media or recording thru MythTV. To work with Suspend or Hibernate your system have to support these modes as well. All schedules are highly configurable. You will find details in the "Changelog"</description>
+    </extension>
 </addon>
