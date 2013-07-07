@@ -130,7 +130,10 @@ class Main:
 	# get timers from vdr
 	def getTimers(self):
 		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGDEBUG)
-		self._nextWakeUp = self.getNextWake()
+		# if we have lost the connection to mythbackend, don't try to update the timers.  This should never happen
+		# because self._MythBackend == False should get caught at the top of the loop.
+		if (self._MythBackend != False):
+			self._nextWakeUp = self.getNextWake()
 
 		xbmc.log(msg="mythtv.powersave: Getting shutdown status", level=xbmc.LOGDEBUG)
 		mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -188,13 +191,22 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: no wake required", level=xbmc.LOGDEBUG)
 			
 	def getNextWake(self):
-		progs = self._MythBackend.getUpcomingRecordings()
+		#check for exception connecting to backend
+		try:
+			progs = self._MythBackend.getUpcomingRecordings()
+		except:
+			self._MythBackend = False
+			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
+			# return previous recording - don't want to change wake timer
+			return self._nextWakeUp
+
+		#we need this try in case there are no recordings scheduled
 		try:
 			rectime = progs.next().recstartts
 			xbmc.log(msg="mythtv.powersave: got record time: %s" % rectime, level=xbmc.LOGDEBUG)
 			return int(rectime.strftime("%s"))
 		except:
-			return 0
+			return self._nextWakeUp
 
 	# returns if any timer is actually recording
 	def getIsRecording(self):
