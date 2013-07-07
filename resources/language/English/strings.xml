@@ -7,6 +7,7 @@
     <string id="30012">Powersave when idle</string>
     <string id="30013">Powersafe after</string>
     <string id="30014">Overrun after playback/record</string>
+    <string id="30015">Powersave warning dialog timeout</string>
     <string id="30020">Daily wakeup</string>
     <string id="30021">Daily wakeup time (HH:MM)</string>
 </strings>

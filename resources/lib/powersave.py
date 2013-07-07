@@ -11,6 +11,7 @@ class Main:
 	_enum_forerun = [1,2,5,10,15,20]
 	_enum_overrun = [1,2,5,10,15,20]
 	_enum_idle = [5,10,15,20,25,30,40,50,60,90,120,180,240,300,360,420,480,540,600]
+	_enum_warn_time = [10,30,60,120,300,600]
 	_enum_powerfunc = ['Suspend', 'Hibernate', 'Powerdown']
 	# reduce sleep time so we don't get caught with our pants down when xbmc tries to exit
 	_sleep_interval = 2 * 1000
@@ -115,6 +116,7 @@ class Main:
 		self.settings['mythps_forerun'] = self._enum_forerun[int(Addon.getSetting('mythps_forerun'))] * 60
 		self.settings['mythps_wakecmd'] = Addon.getSetting('mythps_wakecmd')
 		self.settings['mythps_overrun'] = self._enum_overrun[int(Addon.getSetting('mythps_overrun'))] * 60
+		self.settings['mythps_warn_time'] = self._enum_warn_time[int(Addon.getSetting('mythps_warn_time'))]
 		self.settings['mythps_sleepmode'] = int(Addon.getSetting('mythps_sleepmode'))
 		self.settings['mythps_sleepmode_after'] = self._enum_idle[int(Addon.getSetting('mythps_sleepmode_after'))] * 60
 		self.settings['mythps_dailywakeup'] = Addon.getSetting('mythps_dailywakeup')
@@ -213,7 +215,7 @@ class Main:
 	def doPowersave(self):
 		
 		#show dialog box - give chance to abort
-		duration = 60
+		duration = self.settings['mythps_warn_time']
 		powerFunc = self._enum_powerfunc[self.settings['mythps_sleepmode']-1]
 
 		xbmc.log(msg="mythtv.powersave: creating powersave dialog box for %s" % powerFunc, level=xbmc.LOGDEBUG)

@@ -7,6 +7,7 @@
    <setting id="mythps_sleepmode" type="enum" label="30012" values="Disabled|Suspend (S3)|Hibernate (S4)|Power Off|" default="0"/>
    <setting id="mythps_sleepmode_after" type="enum" label="30013" values="5 Min|10 Min|15 Min|20 Min|25 Min|30 Min|40 Min|50 Min|60 Min|90 Min|120 Min|180 Min|240 Min|300 Min|360 Min|420 Min|480 Min|540 Min|600 Min" default="10"/>   
    <setting id="mythps_overrun" type="enum" label="30014" values="1 Min|2 Min|5 Min|10 Min|15 Min|20 Min" default="2"/>
+   <setting id="mythps_warn_time" type="enum" label="30015" values="10 Sec|30 Sec|1 Min|2 Min|5 Min|10 Min" default="2"/>
    <setting id="mythps_dailywakeup" type="bool" label="30020" default="false"/>
    <setting id="mythps_dailywakeup_time" type="enum" label="30021" values="00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30|04:00|04:30|05:00|05:30|06:00|06:30|07:00|07:30|08:00|08:30|09:00|09:30|10:00|10:30|11:00|11:30|12:00|12:30|13:00|13:30|14:00|14:30|15:00|15:30|16:00|16:30|17:00|17:30|18:00|18:30|19:00|19:30|20:00|20:30|21:00|21:30|22:00|22:30|23:00|23:30" default="12"/>   
 </settings>
