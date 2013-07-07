@@ -15,7 +15,6 @@ class Main:
 	_sleep_interval = 2 * 1000
 	# poll timers/shutdown status every 60 seconds
 	_poll_interval = 60 * 1000 / _sleep_interval
-	_timers = {}
 	_nextWakeup = 0
 	_lastWakeup = 0
 	_idleTime = 0
@@ -95,15 +94,8 @@ class Main:
 				elif (self._isRecording):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGDEBUG)
 				else:
-					if (self.settings['vdrps_sleepmode'] == 1):
-						#xbmc.log(msg="mythtv.powersave: initiating sleepmode S3 ...", level=xbmc.LOGNOTICE)
-						xbmc.executebuiltin('Suspend')
-					elif (self.settings['vdrps_sleepmode'] == 2):
-						#xbmc.log(msg="mythtv.powersave: initiating sleepmode S4 ...", level=xbmc.LOGNOTICE)
-						xbmc.executebuiltin('Hibernate')
-					elif (self.settings['vdrps_sleepmode'] == 3):
-						#xbmc.log(msg="mythtv.powersave: initiating powerdown ...", level=xbmc.LOGNOTICE)
-						xbmc.executebuiltin('Powerdown')
+					self.doPowersave()
+					
 			
 			# sleep a little ...
 			xbmc.sleep(self._sleep_interval)
@@ -215,3 +207,16 @@ class Main:
 	# this returns the most recent enabled timestamp, or None
 	def getMostRecentTimer(self):
 		return self._nextWakeUp
+
+	# function to actually do the powersaving
+	def doPowersave(self):
+		if (self.settings['vdrps_sleepmode'] == 1):
+			xbmc.log(msg="mythtv.powersave: initiating sleepmode S3 ...", level=xbmc.LOGNOTICE)
+			xbmc.executebuiltin('Suspend')
+		elif (self.settings['vdrps_sleepmode'] == 2):
+			xbmc.log(msg="mythtv.powersave: initiating sleepmode S4 ...", level=xbmc.LOGNOTICE)
+			xbmc.executebuiltin('Hibernate')
+		elif (self.settings['vdrps_sleepmode'] == 3):
+			xbmc.log(msg="mythtv.powersave: initiating powerdown ...", level=xbmc.LOGNOTICE)
+			xbmc.executebuiltin('Powerdown')
+
