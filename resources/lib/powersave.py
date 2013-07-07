@@ -95,9 +95,7 @@ class Main:
 				if (self._isPlaying):
 					print "mythtv.powersave: powersave postponed - xbmc is playing ..."
 				elif (self._isRecording):
-					print "mythtv.powersave: powersave postponed - vdr is recording ..."
-				elif (self.getIsRecordPending()):
-					print "mythtv.powersave: powersave postponed - record upcomming ..."
+					print "mythtv.powersave: powersave postponed - mythtv is recording ..."
 				else:
 					if (self.settings['vdrps_sleepmode'] == 1):
 						#print "mythtv.powersave: initiating sleepmode S3 ..."
@@ -108,18 +106,6 @@ class Main:
 					elif (self.settings['vdrps_sleepmode'] == 3):
 						#print "mythtv.powersave: initiating powerdown ..."
 						xbmc.executebuiltin('Powerdown')
-			
-			
-			# Disabled due to bugged service abort on logouts
-			# are we logged on? (Dialog <> 10029)			
-			#self._isLoggedOn = (xbmcgui.getCurrentWindowId()<>10029)
-			# check for automatic logout ...
-			#if (self.settings['vdrps_autologout'] == "true") & \
-			   #(self._idleTime > self.settings['vdrps_autologout_after']) & \
-			   #self._isLoggedOn:
-				## logging out is safe
-				#xbmc.executebuiltin('System.LogOff')
-			
 			
 			# sleep a little ...
 			xbmc.sleep(self._sleep_interval)
@@ -138,9 +124,6 @@ class Main:
 		self.settings['vdrps_forerun'] = self._enum_forerun[int(Addon.getSetting('vdrps_forerun'))] * 60
 		self.settings['vdrps_wakecmd'] = Addon.getSetting('vdrps_wakecmd')
 		self.settings['vdrps_overrun'] = self._enum_forerun[int(Addon.getSetting('vdrps_overrun'))] * 60
-		# Disabled due to bugged service abort on logouts
-		#self.settings['vdrps_autologout'] = Addon.getSetting('vdrps_autologout')
-		#self.settings['vdrps_autologout_after'] = self._enum_idle[int(Addon.getSetting('vdrps_autologout_after'))] * 60
 		self.settings['vdrps_sleepmode'] = int(Addon.getSetting('vdrps_sleepmode'))
 		self.settings['vdrps_sleepmode_after'] = self._enum_idle[int(Addon.getSetting('vdrps_sleepmode_after'))] * 60
 		self.settings['vdrps_dailywakeup'] = Addon.getSetting('vdrps_dailywakeup')
@@ -149,17 +132,9 @@ class Main:
 	# get timers from vdr
 	def getTimers(self):
 		print "mythtv.powersave: Getting timers ..."
-		# contact SVDRP and parse resopnse
-		# raw = self._querySVDRP(self.settings['vdrps_host'], self.settings['vdrps_port'])
-		# # parse when get a response
-		# if (raw != None):
-		# 	self._parseSVDRP(raw)
 		self._nextWakeUp = self.getNextWake()
-		print "mythtv.powersave: Got timer"
 
-		
-		# self._mythShutdownStatus = os.system("checkshutdown --syslog")
-		# self._mythShutdownStatus = os.system("mythshutdown -v --status --logpath=/home/tom/Desktop")
+		print "mythtv.powersave: Getting shutdown status"
 		mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 		self._mythShutdownStatus=int(mythStatus.stdout.read())
 
@@ -201,7 +176,6 @@ class Main:
 		
 		# is it in the future and not already set?
 		print("mythtv.powersave: next recording: %d" % stampWakeup)
-
 		print("mythtv.powersave: final wake time: %d" % stampFinalWakeup)
 		print("mythtv.powersave: time now: %d" % stampNow)
 		print("mythtv.powersave: last wake: %d" % self._lastWakeup)
@@ -215,51 +189,6 @@ class Main:
 		else:
 			print "mythtv.powersave: no wake required"
 			
-	# contact SVDRP service and get raw timers
-	# def _querySVDRP(self, host, port):
-	# 	try:
-	# 		tndata = None
-	# 		# getting in contact
-	# 		tnsession = telnetlib.Telnet(host,port,5)
-	# 		try:
-	# 			# sending commands
-	# 			tnsession.write("LSTT\n")
-	# 			tnsession.write("QUIT\n")
-	# 			# getting data
-	# 			tndata = tnsession.read_until("closing connection")
-	# 		finally:
-	# 			# clean up our mess, and get back
-	# 			tnsession.close()
-	# 			return tndata
-
-	# 	except:
-	# 		# made a boo boo
-	# 		print "mythtv.powersave: cannot get list of timers from %s:%s " % (host, port)
-	# 		return None
-			
-	# # this function parses the SVDRP session dump for timers and returns a dictonary with status
-	# def _parseSVDRP(self, raw):
-	# 	# empty result list
-	# 	timers = {}
-	# 	# loop thru lines
-	# 	for line in raw.splitlines():
-	# 		# as we know timers getting returned with status 250 (ok) 
-	# 		if line.startswith("250"):
-	# 			try:
-	# 				# get into the fields
-	# 				fields = line[4:].split(":")
-	# 				# check the timer status (flags 1: enabled, 2, instant record, 4, vps, 8: active)
-	# 				timer_status = fields[0].split(" ")[1]
-	# 				# decode starting time
-	# 				timer_start = int(time.mktime(time.strptime(fields[2]+fields[3], "%Y-%m-%d%H%M")))
-	# 				# fill the timer dictonary
-	# 				if timer_start>0:
-	# 					timers[timer_start] = int(timer_status)
-	# 			except: 
-	# 				# some lines may fail
-	# 				print "mythtv.powersave: unable to parse line '%s' " % (line)
-	# 	self._timers = timers
-
 	def getNextWake(self):
 		progs = self._MythBackend.getUpcomingRecordings()
 		try:
@@ -271,39 +200,8 @@ class Main:
 
 	# returns if any timer is actually recording
 	def getIsRecording(self):
-		# for status in self._timers.values():
-		# 	if (status & 8) == 8:
-		# 		return True
-		# return False
-		
-		# query checkshutdown
 		return (self._mythShutdownStatus != 0)
 	
-	# returns if a record is upcomming within forerun, or idle time to prevent powersave 
-	def getIsRecordPending(self):
-		# decide which period lasts longer
-		# if (self.settings['vdrps_forerun'] > self.settings['vdrps_sleepmode_after']):
-		# 	delta = self.settings['vdrps_forerun']
-		# else:
-		# 	# odd people may set the recording prerun smaller than idle time
-		# 	delta = self.settings['vdrps_sleepmode_after']
-		# # we need the stamps
-		# stamps = self._timers.keys()
-		# stampNow = int(time.time())
-		# for stamp in stamps:
-		# 	if (self._timers[stamp] & 1 == 1) & (stamp-delta < stampNow ):
-		# 		# there is a record upcomming
-		# 		return True
-		return False
-
 	# this returns the most recent enabled timestamp, or None
 	def getMostRecentTimer(self):
-		# # we need a sorted list of the timestamps
-		# stamps = self._timers.keys()
-		# stamps.sort()
-		# # now search for the first enabled one
-		# for stamp in stamps:
-		# 	if self._timers[stamp] & 1 == 1:
-		# 		return int(stamp)
-		# return 0;
 		return self._nextWakeUp
