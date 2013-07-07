@@ -10,7 +10,8 @@ class Main:
 	_base = sys.argv[0]
 	_enum_forerun = [1,2,5,10,15,20]
 	_enum_overrun = [1,2,5,10,15,20]
-	_enum_idle= [5,10,15,20,25,30,40,50,60,90,120,180,240,300,360,420,480,540,600]
+	_enum_idle = [5,10,15,20,25,30,40,50,60,90,120,180,240,300,360,420,480,540,600]
+	_enum_powerfunc = ['Suspend', 'Hibernate', 'Powerdown']
 	# reduce sleep time so we don't get caught with our pants down when xbmc tries to exit
 	_sleep_interval = 2 * 1000
 	# poll timers/shutdown status every 60 seconds
@@ -46,7 +47,7 @@ class Main:
 					continue
 				xbmc.log(msg="mythtv.powersave: Mythbackend connected!", level=xbmc.LOGNOTICE)
 				self.getTimers()
-					
+
 			# reload timers periodically
 			if (pollCounter > self._poll_interval):
 				pollCounter = 0
@@ -84,6 +85,7 @@ class Main:
 				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
 
 			xbmc.log(msg="mythtv.powersave: IsRecording: %s" % self._isRecording, level=xbmc.LOGDEBUG)
+			xbmc.log(msg="mythtv.powersave: IdleTime: %d" % self._realIdleTime, level=xbmc.LOGDEBUG)
 
 			# powersave checks ...
 			if (self.settings['vdrps_sleepmode'] > 0) & \
@@ -210,13 +212,30 @@ class Main:
 
 	# function to actually do the powersaving
 	def doPowersave(self):
-		if (self.settings['vdrps_sleepmode'] == 1):
-			xbmc.log(msg="mythtv.powersave: initiating sleepmode S3 ...", level=xbmc.LOGNOTICE)
-			xbmc.executebuiltin('Suspend')
-		elif (self.settings['vdrps_sleepmode'] == 2):
-			xbmc.log(msg="mythtv.powersave: initiating sleepmode S4 ...", level=xbmc.LOGNOTICE)
-			xbmc.executebuiltin('Hibernate')
-		elif (self.settings['vdrps_sleepmode'] == 3):
-			xbmc.log(msg="mythtv.powersave: initiating powerdown ...", level=xbmc.LOGNOTICE)
-			xbmc.executebuiltin('Powerdown')
+		
+		#show dialog box - give chance to abort
+		duration = 60
+		powerFunc = self._enum_powerfunc[self.settings['vdrps_sleepmode']-1]
+
+		xbmc.log(msg="mythtv.powersave: creating powersave dialog box for %s" % powerFunc, level=xbmc.LOGDEBUG)
+		pDialog = xbmcgui.DialogProgress()
+		pDialog.create("MythTV Powersave", "Preparing to %s" % powerFunc)
+
+		i = 0
+		while(i < duration and not pDialog.iscanceled()):
+			percent = int(i/float(duration) * 100)
+			text = "%s in %d seconds" % (powerFunc, (duration - i))
+			xbmc.log(msg="mythtv.powersave: updating dialog with %d" % percent, level=xbmc.LOGDEBUG)
+			pDialog.update(percent, text)
+			i = i + 1
+			xbmc.sleep(1000)
+
+		pDialog.close()
+
+		if pDialog.iscanceled():
+			self._realIdleTime = 0
+			return
+
+		xbmc.log(msg="mythtv.powersave: executing builtin function: '%s'" % powerFunc, level=xbmc.LOGNOTICE)
+		xbmc.executebuiltin(powerFunc)
 
