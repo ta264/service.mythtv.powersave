@@ -187,8 +187,9 @@ class Main:
 			else:
 				# add a whole day
 				stampDailyWakeup = stampDateOnly + self.settings['vdrps_dailywakeup_time'] + 86400
+			
 
-
+			print("mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup)
 				
 			# daily wakeup is before next timer, so set the alarm clock to it
 			if (stampDailyWakeup<stampWakeup) | (stampWakeup < 300000):
@@ -200,7 +201,7 @@ class Main:
 		
 		# is it in the future and not already set?
 		print("mythtv.powersave: next recording: %d" % stampWakeup)
-		print("mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup)
+
 		print("mythtv.powersave: final wake time: %d" % stampFinalWakeup)
 		print("mythtv.powersave: time now: %d" % stampNow)
 		print("mythtv.powersave: last wake: %d" % self._lastWakeup)
