@@ -31,12 +31,11 @@ class Main:
 	def __init__(self):
 		print "mythtv.powersave: Plugin started"
 		self.getSettings()
-		# self.getTimers()
 		pollCounter = self._poll_interval
+
 		# main loop
 		while (not xbmc.abortRequested):
 			# try to connect to backend
-			# print("mythtv.powersave: %s" % self._MythBackend)
 			if (self._MythBackend == False):
 				print "mythtv.powersave: Mythbackend not connected - pause/retry"
 				try:
@@ -83,9 +82,6 @@ class Main:
 			if (self._lastRecording  == True) & (self._isRecording == False) & (self._realIdleTime >= self.settings['vdrps_sleepmode_after']):
 				self._realIdleTime = self.settings['vdrps_sleepmode_after'] - self.settings['vdrps_overrun']
 
-			
-			
-			print "mythtv.powersave: Mark"
 			print("mythtv.powersave: IsRecording: %s" % self._isRecording)
 
 			# powersave checks ...
@@ -181,7 +177,7 @@ class Main:
 		print("mythtv.powersave: last wake: %d" % self._lastWakeup)
 		if (stampFinalWakeup>stampNow) & (stampFinalWakeup <> self._lastWakeup):
 			# yes we do have to wakeup
-			print "mythtv.powersave: Wake up on timestamp %d (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup)) )
+			print "mythtv.powersave: Setting wake up on timestamp %d (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup)) )
 			# call the alarm script
 			os.system("%s %d" % (self.settings['vdrps_wakecmd'],stampFinalWakeup))
 			# remember the stamp, not to call alarm script twice with the same value
