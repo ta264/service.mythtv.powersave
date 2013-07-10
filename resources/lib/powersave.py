@@ -131,10 +131,15 @@ class Main:
 			self._nextWakeup = self.getNextWake()
 
 		xbmc.log(msg="mythtv.powersave: Getting shutdown status", level=xbmc.LOGDEBUG)
-		mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-		self._mythShutdownStatus=int(mythStatus.stdout.read())
 
-		xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
+		# if getting shutdown status fails, don't allow shutdown
+		try:
+			mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+			self._mythShutdownStatus=int(mythStatus.stdout.read())
+			xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
+		except:
+			self._mythShutdownStatus=1
+			xbmc.log(msg="mythtv.powersave: Querying mythshutdown failed! Not allowing powersave" % self._mythShutdownStatus, level=xbmc.LOGERROR)
 
 
 	# set the alarm clock if necessary
