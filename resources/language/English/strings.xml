@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <strings>
     <string id="30000">MythTV Host</string>
-    <string id="30001">MythTV Port</string>
     <string id="30002">Wakeup before record</string>
     <string id="30003">Wakeuptime command (cmd [timestamp])</string>
     <string id="30012">Powersave when idle</string>
@@ -10,4 +9,7 @@
     <string id="30015">Powersave warning dialog timeout</string>
     <string id="30020">Daily wakeup</string>
     <string id="30021">Daily wakeup time (HH:MM)</string>
+    <string id="30031">MythTV DB Name</string>
+    <string id="30032">MythTV DB Username</string>
+    <string id="30033">MythTV DB Password</string>
 </strings>

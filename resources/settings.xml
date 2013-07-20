@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <settings>
    <setting id="mythps_host" type="text" label="30000" default="127.0.0.1"/>
-   <setting id="mythps_port" type="text" label="30001" default="6419"/>
+   <setting id="mythps_dbname" type="text" label="30031" default="mythconverg"/>
+   <setting id="mythps_dbuser" type="text" label="30032" default="mythtv"/>
+   <setting id="mythps_dbpass" type="text" label="30033" default="mythtv"/>
    <setting id="mythps_forerun" type="enum" label="30002" values="1 Min|2 Min|5 Min|10 Min|15 Min|20 Min" default="2"/>
    <setting id="mythps_wakecmd" type="text" label="30003" default="sudo /usr/bin/setwakeup.sh"/>
    <setting id="mythps_sleepmode" type="enum" label="30012" values="Disabled|Suspend (S3)|Hibernate (S4)|Power Off|" default="0"/>

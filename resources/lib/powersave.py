@@ -26,6 +26,7 @@ class Main:
 	_isPlaying = False
 	_lastRecording = False
 	_isRecording = False
+	_MythDB = False
 	_MythBackend = False
 	_mythShutdownStatus = -2
 
@@ -41,7 +42,11 @@ class Main:
 			if (self._MythBackend == False):
 				xbmc.log(msg="mythtv.powersave: Mythbackend not connected - pause/retry", level=xbmc.LOGNOTICE)
 				try:
-					self._MythBackend = MythTV.MythBE()
+					self._MythDB = MythTV.MythDB(DBHostName = self.settings['mythps_host'],
+								     DBName = self.settings['mythps_dbname'],
+								     DBUserName = self.settings['mythps_dbuser'],
+								     DBPassword = self.settings['mythps_dbpass'])
+					self._MythBackend = MythTV.MythBE(self.settings['mythps_host'], db=self._MythDB)
 				except:
 					xbmc.sleep(self._sleep_interval)
 					continue
@@ -112,7 +117,9 @@ class Main:
 		xbmc.log(msg="mythtv.powersave: Getting settings ...", level=xbmc.LOGDEBUG)
 		self.settings = {}
 		self.settings['mythps_host'] = Addon.getSetting('mythps_host')
-		self.settings['mythps_port'] = int(Addon.getSetting('mythps_port'))
+		self.settings['mythps_dbname'] = Addon.getSetting('mythps_dbname')
+		self.settings['mythps_dbuser'] = Addon.getSetting('mythps_dbuser')
+		self.settings['mythps_dbpass'] = Addon.getSetting('mythps_dbpass')
 		self.settings['mythps_forerun'] = self._enum_forerun[int(Addon.getSetting('mythps_forerun'))] * 60
 		self.settings['mythps_wakecmd'] = Addon.getSetting('mythps_wakecmd')
 		self.settings['mythps_overrun'] = self._enum_overrun[int(Addon.getSetting('mythps_overrun'))] * 60
