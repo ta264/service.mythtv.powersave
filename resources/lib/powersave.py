@@ -146,7 +146,7 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
 		except:
 			self._mythShutdownStatus=1
-			xbmc.log(msg="mythtv.powersave: Querying mythshutdown failed! Not allowing powersave" % self._mythShutdownStatus, level=xbmc.LOGERROR)
+			xbmc.log(msg="mythtv.powersave: Querying mythshutdown failed! Not allowing powersave", level=xbmc.LOGERROR)
 
 
 	# set the alarm clock if necessary
