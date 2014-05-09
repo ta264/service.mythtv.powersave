@@ -245,7 +245,9 @@ class Main:
 
 		pDialog.close()
 
-		if pDialog.iscanceled():
+		# check if dialog was cancelled or shutdown locked since dialog started
+		self.getTimers()
+		if pDialog.iscanceled() or self.getIsRecording():
 			self._realIdleTime = 0
 			return
 
