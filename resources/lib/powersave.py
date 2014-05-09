@@ -141,8 +141,7 @@ class Main:
 
 		# if getting shutdown status fails, don't allow shutdown
 		try:
-			mythStatus=subprocess.Popen("mythshutdownstatus", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-			self._mythShutdownStatus=int(mythStatus.stdout.read())
+			self._mythShutdownStatus = subprocess.call("checkshutdown")
 			xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
 		except:
 			self._mythShutdownStatus=1
