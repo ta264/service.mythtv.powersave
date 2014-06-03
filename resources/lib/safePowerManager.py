@@ -25,6 +25,8 @@ class SafePowerManager:
         if self.okToShutdown():
             xbmc.log(msg="mythtv.powersave: executing builtin function: '%s'" % functionstr, level=xbmc.LOGNOTICE)
             xbmc.executebuiltin(functionstr)
+        else:
+            xbmc.log(msg="mythtv.powersave: %s blocked by checkshutdown" % functionstr, level=xbmc.LOGNOTICE)
 
     def Reboot(self):
         self.do("Reboot")
