@@ -1,5 +1,5 @@
-import sys, os, socket, telnetlib, time
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import sys, os, time
+import xbmc, xbmcaddon, xbmcgui
 import MythTV
 
 from safePowerManager import SafePowerManager
