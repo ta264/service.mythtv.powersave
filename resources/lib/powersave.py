@@ -1,10 +1,10 @@
-import sys, os, socket, telnetlib, time, subprocess
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import sys, os, time
+import xbmc, xbmcaddon, xbmcgui
 import MythTV
 
+from safePowerManager import SafePowerManager
+
 Addon = xbmcaddon.Addon(id="mythtv.powersave")
-
-
 
 class Main:
 	_base = sys.argv[0]
@@ -28,13 +28,14 @@ class Main:
 	_isRecording = False
 	_MythDB = False
 	_MythBackend = False
-	_mythShutdownStatus = -2
+	_SafePowerManager = False
 
 	# main routine
 	def __init__(self):
 		xbmc.log(msg="mythtv.powersave: Plugin started", level=xbmc.LOGNOTICE)
 		self.getSettings()
 		pollCounter = self._poll_interval
+		self._SafePowerManager = SafePowerManager()
 
 		# main loop
 		while (not xbmc.abortRequested):
@@ -137,16 +138,7 @@ class Main:
 		if (self._MythBackend != False):
 			self._nextWakeup = self.getNextWake()
 
-		xbmc.log(msg="mythtv.powersave: Getting shutdown status", level=xbmc.LOGDEBUG)
-
-		# if getting shutdown status fails, don't allow shutdown
-		try:
-			self._mythShutdownStatus = subprocess.call("checkshutdown")
-			xbmc.log(msg="mythtv.powersave: Mythshutdown status: %d" % self._mythShutdownStatus, level=xbmc.LOGDEBUG)
-		except:
-			self._mythShutdownStatus=1
-			xbmc.log(msg="mythtv.powersave: Querying mythshutdown failed! Not allowing powersave", level=xbmc.LOGERROR)
-
+		self._SafePowerManager.updateStatus()
 
 	# set the alarm clock if necessary
 	def setWakeup(self):
@@ -216,7 +208,7 @@ class Main:
 
 	# returns if any timer is actually recording
 	def getIsRecording(self):
-		return (self._mythShutdownStatus != 0)
+		return not self._SafePowerManager.okToShutdown()
 	
 	# this returns the most recent enabled timestamp, or None
 	def getMostRecentTimer(self):
@@ -244,12 +236,10 @@ class Main:
 
 		pDialog.close()
 
-		# check if dialog was cancelled or shutdown locked since dialog started
-		self.getTimers()
-		if pDialog.iscanceled() or self.getIsRecording():
-			self._realIdleTime = 0
-			return
+		# reset idle time in case dialog was cancelled.
+		self._realIdleTime = 0
 
-		xbmc.log(msg="mythtv.powersave: executing builtin function: '%s'" % powerFunc, level=xbmc.LOGNOTICE)
-		xbmc.executebuiltin(powerFunc)
+		# check if dialog was cancelled.  If not, try to powerdown (this will check status again)
+		if not pDialog.iscanceled():
+			self._SafePowerManager.do(powerFunc)
 
