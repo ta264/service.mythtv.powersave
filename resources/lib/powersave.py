@@ -163,7 +163,7 @@ class Main:
 				stampDailyWakeup = stampDateOnly + self.settings['mythps_dailywakeup_time'] + 86400
 			
 
-			xbmc.log(msg="mythtv.powersave: next scheduled wake: %d" % stampDailyWakeup, level=xbmc.LOGDEBUG)
+			xbmc.log(msg="mythtv.powersave: next scheduled daily wake: %s" % time.asctime(time.localtime(stampDailyWakeup)), level=xbmc.LOGDEBUG)
 				
 			# daily wakeup is before next timer, so set the alarm clock to it
 			if (stampDailyWakeup<stampWakeup) | (stampWakeup < 300000):
@@ -174,19 +174,19 @@ class Main:
 			stampFinalWakeup = stampWakeup
 		
 		# is it in the future and not already set?
-		xbmc.log(msg="mythtv.powersave: next recording: %d" % stampWakeup, level=xbmc.LOGDEBUG)
-		xbmc.log(msg="mythtv.powersave: final wake time: %d" % stampFinalWakeup, level=xbmc.LOGDEBUG)
-		xbmc.log(msg="mythtv.powersave: time now: %d" % stampNow, level=xbmc.LOGDEBUG)
-		xbmc.log(msg="mythtv.powersave: last wake: %d" % self._lastWakeup, level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: next recording: %s" % time.asctime(time.localtime(stampWakeup)), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: final wake time: %s" % time.asctime(time.localtime(stampFinalWakeup)), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: time now: %s" % time.asctime(time.localtime(stampNow)), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: previously set wake at: %s" % time.asctime(time.localtime(self._lastWakeup)), level=xbmc.LOGDEBUG)
 		if (stampFinalWakeup>stampNow) & (stampFinalWakeup <> self._lastWakeup):
 			# yes we do have to wakeup
-			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %d (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
+			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %s (%s)" % (stampFinalWakeup, time.asctime(time.localtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
 			# call the alarm script
 			os.system("%s %d" % (self.settings['mythps_wakecmd'],stampFinalWakeup))
 			# remember the stamp, not to call alarm script twice with the same value
 			self._lastWakeup = stampFinalWakeup
 		else:
-			xbmc.log(msg="mythtv.powersave: no wake required", level=xbmc.LOGDEBUG)
+			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
 	def getNextWake(self):
 		#check for exception connecting to backend
@@ -201,7 +201,7 @@ class Main:
 		#we need this try in case there are no recordings scheduled
 		try:
 			rectime = progs.next().recstartts
-			xbmc.log(msg="mythtv.powersave: got record time: %s" % rectime, level=xbmc.LOGDEBUG)
+			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % rectime.strftime("%c"), level=xbmc.LOGDEBUG)
 			return int(rectime.strftime("%s"))
 		except:
 			return self._nextWakeup
