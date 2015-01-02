@@ -206,8 +206,10 @@ class Main:
 			rectime = progs.next().recstartts.utctimetuple()
 			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % time.strftime("%c", rectime), level=xbmc.LOGDEBUG)
 			return time.mktime(rectime)
-		except:
-			return self._nextWakeup
+		except StopIteration:
+                        # If we don't have a scheduled recording, return 0
+                        xbmc.log(msg="mythtv.powersave: no scheduled recordings", level=xbmc.LOGDEBUG)
+			return 0
 
 	# returns if any timer is actually recording
 	def getIsRecording(self):
