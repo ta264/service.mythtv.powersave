@@ -22,10 +22,7 @@ class Main:
 	_idleTime = 0
 	_lastIdleTime = 0
 	_realIdleTime = 0
-	_lastPlaying = False
-	_isPlaying = False
-	_lastRecording = False
-	_isRecording = False
+        _wasBusy = False
 	_MythDB = False
 	_MythBackend = False
 	_SafePowerManager = False
@@ -71,39 +68,28 @@ class Main:
 			else:
 				self._realIdleTime = self._idleTime
 
-			# notice changes in playback and recording status
-			self._lastPlaying, self._isPlaying = self._isPlaying, xbmc.Player().isPlaying()
-                        self.lastRecording, self._isRecording = self._isRecording, self.getIsRecording()
-			
 			# now this one is tricky: a playback ended, idle would suggest to powersave, but we set the clock back for overrun. 
 			# Otherwise xbmc could sleep instantly at the end of a movie
-			if (self._lastPlaying  == True and 
-                            self._isPlaying == False and 
+                        isBusyTemp = self.IsBusy()
+			if (self._wasBusy  == True and 
+                            self.isBusyTemp == False and 
                             self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
+                        self._wasBusy = isBusyTemp
 
-			# same trick, for recording issues - gives time to postprocess
-			if (self._lastRecording  == True and 
-                            self._isRecording == False and 
-                            self._realIdleTime >= self.settings['mythps_sleepmode_after']):
-				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
-
-			xbmc.log(msg="mythtv.powersave: IsRecording: %s" % self._isRecording, level=xbmc.LOGDEBUG)
+			xbmc.log(msg="mythtv.powersave: isBusy: %s" % isBusyTemp, level=xbmc.LOGDEBUG)
 			xbmc.log(msg="mythtv.powersave: IdleTime: %d" % self._realIdleTime, level=xbmc.LOGDEBUG)
 
 			# powersave checks ...
 			if (self.settings['mythps_sleepmode'] > 0) & \
 			   (self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				# sleeping time already?
-				if (self._isPlaying):
-					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGDEBUG)
-				elif (self._isRecording):
-					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGDEBUG)
+				if (self._wasBusy):
+					xbmc.log(msg="mythtv.powersave: powersave postponed - busy...", level=xbmc.LOGDEBUG)
                                 elif ((self.getNextRecStart() > time.time()) & (self.getNextRecStart() - time.time() < 60* 5)):
                                         xbmc.log(msg="mythtv.powersave: powersave postponed - Less than 5 mins to next wake.", level=xbmc.LOGDEBUG)
 				else:
 					self.doPowersave()
-					
 			
 			# sleep a little ...
 			xbmc.sleep(self._sleep_interval)
@@ -206,9 +192,9 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
 	# returns if any timer is actually recording
-	def getIsRecording(self):
-		return not self._SafePowerManager.okToShutdown()
-	
+	def isBusy(self):
+		return (not self._SafePowerManager.okToShutdown()) or xbmc.Player().isPlaying()
+
 	# this returns the most recent enabled timestamp, or None
 	def getNextRecStart(self):
 		return self._nextRecStart
