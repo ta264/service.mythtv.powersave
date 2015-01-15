@@ -128,19 +128,18 @@ class Main:
 		except:
 			self._MythBackend = False
 			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
-			# return previous recording - don't want to change wake timer
-			return self._nextRecStart
+			# Don't change recording
 
 		#we need this try in case there are no recordings scheduled
 		try:
                         # The python binding returns a datetime object.  Convert to UTC time object.
 			rectime = progs.next().recstartts.utctimetuple()
 			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % time.strftime("%c", rectime), level=xbmc.LOGDEBUG)
-			return time.mktime(rectime)
+			self._nextRecStart = time.mktime(rectime)
 		except StopIteration:
                         # If we don't have a scheduled recording, return 0
                         xbmc.log(msg="mythtv.powersave: no scheduled recordings", level=xbmc.LOGDEBUG)
-			return 0
+			self._nextRecStart = 0
 
 		self._SafePowerManager.updateStatus()
 
@@ -192,14 +191,15 @@ class Main:
 		else:
 			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
-	# returns if any timer is actually recording
+	# checks if SafePowerManager is happy, xbmc is playing or we are due to start recording soon.
 	def isBusy(self):
                 busy = (not self._SafePowerManager.okToShutdown() or
-                        xbmc.Player().isPlaying())
+                        xbmc.Player().isPlaying() or
+                        self.getNextRecStart() - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self.getNextRecStart())
 
 		return busy
 
-	# this returns the most recent enabled timestamp, or None
+	# this returns the most recent enabled timestamp, or 0 if there isn't one
 	def getNextRecStart(self):
 		return self._nextRecStart
 
