@@ -17,7 +17,7 @@ class Main:
 	_sleep_interval = 2 * 1000
 	# poll timers/shutdown status every 60 seconds
 	_poll_interval = 60 * 1000 / _sleep_interval
-	_nextWakeup = 0
+	_nextRecStart = 0
 	_lastWakeup = 0
 	_idleTime = 0
 	_lastIdleTime = 0
@@ -144,7 +144,7 @@ class Main:
 			self._MythBackend = False
 			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
 			# return previous recording - don't want to change wake timer
-			return self._nextWakeup
+			return self._nextRecStart
 
 		#we need this try in case there are no recordings scheduled
 		try:
@@ -213,7 +213,7 @@ class Main:
 	
 	# this returns the most recent enabled timestamp, or None
 	def getNextRecStart(self):
-		return self._nextWakeup
+		return self._nextRecStart
 
 	# function to actually do the powersaving
 	def doPowersave(self):
