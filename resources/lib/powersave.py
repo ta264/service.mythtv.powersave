@@ -135,7 +135,27 @@ class Main:
 	# get timers from mythtv
 	def getTimers(self):
 		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGDEBUG)
-                self._nextWakeup = self.getNextRecStart()
+
+		#check for exception connecting to backend
+		try:
+			progs = self._MythBackend.getUpcomingRecordings()
+		except:
+			self._MythBackend = False
+			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
+			# return previous recording - don't want to change wake timer
+			return self._nextWakeup
+
+		#we need this try in case there are no recordings scheduled
+		try:
+                        # The python binding returns a datetime object.  Convert to UTC time object.
+			rectime = progs.next().recstartts.utctimetuple()
+			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % time.strftime("%c", rectime), level=xbmc.LOGDEBUG)
+			return time.mktime(rectime)
+		except StopIteration:
+                        # If we don't have a scheduled recording, return 0
+                        xbmc.log(msg="mythtv.powersave: no scheduled recordings", level=xbmc.LOGDEBUG)
+			return 0
+
 		self._SafePowerManager.updateStatus()
 
 	# set the alarm clock if necessary
@@ -186,27 +206,6 @@ class Main:
 		else:
 			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
-	def getNextRecStart(self):
-		#check for exception connecting to backend
-		try:
-			progs = self._MythBackend.getUpcomingRecordings()
-		except:
-			self._MythBackend = False
-			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
-			# return previous recording - don't want to change wake timer
-			return self._nextWakeup
-
-		#we need this try in case there are no recordings scheduled
-		try:
-                        # The python binding returns a datetime object.  Convert to UTC time object.
-			rectime = progs.next().recstartts.utctimetuple()
-			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % time.strftime("%c", rectime), level=xbmc.LOGDEBUG)
-			return time.mktime(rectime)
-		except StopIteration:
-                        # If we don't have a scheduled recording, return 0
-                        xbmc.log(msg="mythtv.powersave: no scheduled recordings", level=xbmc.LOGDEBUG)
-			return 0
-
 	# returns if any timer is actually recording
 	def getIsRecording(self):
 		return not self._SafePowerManager.okToShutdown()
