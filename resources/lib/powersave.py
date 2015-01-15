@@ -86,9 +86,6 @@ class Main:
 				# sleeping time already?
 				if (self._wasBusy):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - busy...", level=xbmc.LOGDEBUG)
-                                elif (self.getNextRecStart() > time.time() and
-                                      self.getNextRecStart() - time.time() < 60 * 5):
-                                        xbmc.log(msg="mythtv.powersave: powersave postponed - Less than 5 mins to next wake.", level=xbmc.LOGDEBUG)
 				else:
 					self.doPowersave()
 			
