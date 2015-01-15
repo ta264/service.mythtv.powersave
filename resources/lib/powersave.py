@@ -135,11 +135,7 @@ class Main:
 	# get timers from mythtv
 	def getTimers(self):
 		xbmc.log(msg="mythtv.powersave: Getting timers ...", level=xbmc.LOGDEBUG)
-		# if we have lost the connection to mythbackend, don't try to update the timers.  This should never happen
-		# because self._MythBackend == False should get caught at the top of the loop.
-		if (self._MythBackend != False):
-			self._nextWakeup = self.getNextRecStart()
-
+                self._nextWakeup = self.getNextRecStart()
 		self._SafePowerManager.updateStatus()
 
 	# set the alarm clock if necessary
