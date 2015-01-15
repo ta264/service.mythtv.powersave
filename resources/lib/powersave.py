@@ -72,7 +72,7 @@ class Main:
 			# Otherwise xbmc could sleep instantly at the end of a movie
                         isBusyTemp = self.isBusy()
 			if (self._wasBusy  == True and 
-                            self.isBusyTemp == False and 
+                            isBusyTemp == False and 
                             self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
                         self._wasBusy = isBusyTemp
