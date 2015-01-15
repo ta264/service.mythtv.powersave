@@ -114,7 +114,7 @@ class Main:
 		# last second alarm clock
 		self.setWakeup()
 		xbmc.log(msg="mythtv.powersave: Plugin exited", level=xbmc.LOGNOTICE)
-		
+
 	# get settings from xbmc
 	def getSettings(self):
 		xbmc.log(msg="mythtv.powersave: Getting settings ...", level=xbmc.LOGDEBUG)
@@ -138,7 +138,7 @@ class Main:
 		# if we have lost the connection to mythbackend, don't try to update the timers.  This should never happen
 		# because self._MythBackend == False should get caught at the top of the loop.
 		if (self._MythBackend != False):
-			self._nextWakeup = self.getNextWake()
+			self._nextWakeup = self.getNextRecStart()
 
 		self._SafePowerManager.updateStatus()
 
@@ -190,7 +190,7 @@ class Main:
 		else:
 			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
-	def getNextWake(self):
+	def getNextRecStart(self):
 		#check for exception connecting to backend
 		try:
 			progs = self._MythBackend.getUpcomingRecordings()
