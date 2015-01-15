@@ -109,9 +109,10 @@ class Main:
 			
 			# sleep a little ...
 			xbmc.sleep(self._sleep_interval)
-		# last second check
+
+		# Exiting, last second check of timers
 		self.getTimers()
-		# last second alarm clock
+		# last second alarm clock update
 		self.setWakeup()
 		xbmc.log(msg="mythtv.powersave: Plugin exited", level=xbmc.LOGNOTICE)
 
