@@ -81,8 +81,8 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: IdleTime: %d" % self._realIdleTime, level=xbmc.LOGDEBUG)
 
 			# powersave checks ...
-			if (self.settings['mythps_sleepmode'] > 0) & \
-			   (self._realIdleTime >= self.settings['mythps_sleepmode_after']):
+			if (self.settings['mythps_sleepmode'] > 0 and
+                            self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				# sleeping time already?
 				if (self._wasBusy):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - busy...", level=xbmc.LOGDEBUG)
