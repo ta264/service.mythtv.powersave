@@ -101,7 +101,7 @@ class Main:
 					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGDEBUG)
 				elif (self._isRecording):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGDEBUG)
-                                elif ((self._nextWakeup > time.time()) & (self._nextWakeup - time.time() < 60* 5)):
+                                elif ((self.getMostRecentTimer() > time.time()) & (self.getMostRecentTimer() - time.time() < 60* 5)):
                                         xbmc.log(msg="mythtv.powersave: powersave postponed - Less than 5 mins to next wake.", level=xbmc.LOGDEBUG)
 				else:
 					self.doPowersave()
