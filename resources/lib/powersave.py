@@ -65,10 +65,9 @@ class Main:
 			self.setWakeup()
 			
 			# time warp calculations demands to have our own idle timers
-			self._lastIdleTime = self._idleTime
-			self._idleTime = xbmc.getGlobalIdleTime()
+			self._lastIdleTime, self._idleTime = self._idleTime, xbmc.getGlobalIdleTime()
 			if (self._idleTime > self._lastIdleTime):
-				self._realIdleTime = self._realIdleTime + (self._idleTime - self._lastIdleTime)
+				self._realIdleTime += self._idleTime - self._lastIdleTime
 			else:
 				self._realIdleTime = self._idleTime
 
