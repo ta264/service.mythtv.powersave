@@ -101,7 +101,7 @@ class Main:
 					xbmc.log(msg="mythtv.powersave: powersave postponed - xbmc is playing ...", level=xbmc.LOGDEBUG)
 				elif (self._isRecording):
 					xbmc.log(msg="mythtv.powersave: powersave postponed - mythtv is recording ...", level=xbmc.LOGDEBUG)
-                                elif ((self.getMostRecentTimer() > time.time()) & (self.getMostRecentTimer() - time.time() < 60* 5)):
+                                elif ((self.getNextRecStart() > time.time()) & (self.getNextRecStart() - time.time() < 60* 5)):
                                         xbmc.log(msg="mythtv.powersave: powersave postponed - Less than 5 mins to next wake.", level=xbmc.LOGDEBUG)
 				else:
 					self.doPowersave()
@@ -163,7 +163,7 @@ class Main:
 	def setWakeup(self):
 		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGDEBUG)
 		# calculate next wakeup time
-		stampWakeup = self.getMostRecentTimer() - self.settings['mythps_forerun']
+		stampWakeup = self.getNextRecStart() - self.settings['mythps_forerun']
 
 		stampNow = int(time.time())
 
@@ -212,7 +212,7 @@ class Main:
 		return not self._SafePowerManager.okToShutdown()
 	
 	# this returns the most recent enabled timestamp, or None
-	def getMostRecentTimer(self):
+	def getNextRecStart(self):
 		return self._nextWakeup
 
 	# function to actually do the powersaving
