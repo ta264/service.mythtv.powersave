@@ -19,8 +19,6 @@ class Main:
 	_poll_interval = 60 * 1000 / _sleep_interval
 	_nextRecStart = 0
 	_lastSetWakeup = 0
-	_idleTime = 0
-	_lastIdleTime = 0
 	_realIdleTime = 0
         _wasBusy = False
 	_MythDB = False
@@ -33,6 +31,8 @@ class Main:
 		self.getSettings()
 		pollCounter = self._poll_interval
 		self._SafePowerManager = SafePowerManager()
+                idleTime = 0
+                lastIdleTime = 0
 
 		# main loop
 		while (not xbmc.abortRequested):
@@ -61,12 +61,12 @@ class Main:
 			# set wakeup
 			self.setWakeup()
 			
-			# time warp calculations demands to have our own idle timers
-			self._lastIdleTime, self._idleTime = self._idleTime, xbmc.getGlobalIdleTime()
-			if (self._idleTime > self._lastIdleTime):
-				self._realIdleTime += self._idleTime - self._lastIdleTime
+                        # Our own idle time counter so that we can reset it
+			lastIdleTime, idleTime = idleTime, xbmc.getGlobalIdleTime()
+			if (idleTime > lastIdleTime):
+				self._realIdleTime += idleTime - lastIdleTime
 			else:
-				self._realIdleTime = self._idleTime
+				self._realIdleTime = idleTime
 
 			# now this one is tricky: a playback ended, idle would suggest to powersave, but we set the clock back for overrun. 
 			# Otherwise xbmc could sleep instantly at the end of a movie
