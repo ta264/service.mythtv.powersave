@@ -18,7 +18,7 @@ class Main:
 	# poll timers/shutdown status every 60 seconds
 	_poll_interval = 60 * 1000 / _sleep_interval
 	_nextRecStart = 0
-	_lastWakeup = 0
+	_lastSetWakeup = 0
 	_idleTime = 0
 	_lastIdleTime = 0
 	_realIdleTime = 0
@@ -171,13 +171,13 @@ class Main:
 		
 		xbmc.log(msg="mythtv.powersave: final wake time: %s" % time.asctime(time.gmtime(stampFinalWakeup)), level=xbmc.LOGDEBUG)
 		xbmc.log(msg="mythtv.powersave: time now: %s" % time.asctime(time.gmtime(stampNow)), level=xbmc.LOGDEBUG)
-		xbmc.log(msg="mythtv.powersave: previously set wake at: %s" % time.asctime(time.gmtime(self._lastWakeup)), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: previously set wake at: %s" % time.asctime(time.gmtime(self._lastSetWakeup)), level=xbmc.LOGDEBUG)
 
                 # Actually set wakeup
-		if (stampFinalWakeup>stampNow) and (stampFinalWakeup != self._lastWakeup):
+		if (stampFinalWakeup>stampNow) and (stampFinalWakeup != self._lastSetWakeup):
 			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %s (%s)" % (stampFinalWakeup, time.asctime(time.gmtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
 			os.system("%s %d" % (self.settings['mythps_wakecmd'],stampFinalWakeup))
-			self._lastWakeup = stampFinalWakeup
+			self._lastSetWakeup = stampFinalWakeup
 		else:
 			xbmc.log(msg="mythtv.powersave: no wake required or wake time already set", level=xbmc.LOGDEBUG)
 			
