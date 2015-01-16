@@ -144,11 +144,11 @@ class Main:
 	def setWakeup(self):
 
 		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGDEBUG)
-		xbmc.log(msg="mythtv.powersave: next recording start time: %s" % time.asctime(time.gmtime(self.getNextRecStart())), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: next recording start time: %s" % time.asctime(time.gmtime(self._nextRecStart)), level=xbmc.LOGDEBUG)
 
 		# initial values
 		stampNow = int(time.time())
-		stampRecWakeup = max(self.getNextRecStart() - self.settings['mythps_forerun'], stampNow)
+		stampRecWakeup = max(self._nextRecStart - self.settings['mythps_forerun'], stampNow)
                 stampDailyWakeup = stampRecWakeup
 
 		# some extra calculations for daily wakeing
@@ -185,7 +185,7 @@ class Main:
 	def isBusy(self):
                 pm_busy = not self._SafePowerManager.okToShutdown()
                 xbmc_busy = xbmc.Player().isPlaying()
-                rec_starting = self.getNextRecStart() - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self.getNextRecStart() + 60
+                rec_starting = self._nextRecStart - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self._nextRecStart + 60
 
                 xbmc.log(msg="mythtv.powersave: pm_busy: %s" % pm_busy, level=xbmc.LOGDEBUG)
                 xbmc.log(msg="mythtv.powersave: xbmc_busy: %s" % xbmc_busy, level=xbmc.LOGDEBUG)
@@ -194,10 +194,6 @@ class Main:
                 busy = pm_busy or xbmc_busy or rec_starting
 
 		return busy
-
-	# this returns the most recent enabled timestamp, or 0 if there isn't one
-	def getNextRecStart(self):
-		return self._nextRecStart
 
 	# function to actually do the powersaving
 	def doPowersave(self):
