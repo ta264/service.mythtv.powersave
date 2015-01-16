@@ -144,7 +144,7 @@ class Main:
 	def setWakeup(self):
 		xbmc.log(msg="mythtv.powersave: Setting wake time...", level=xbmc.LOGDEBUG)
 		# calculate next wakeup time
-		stampWakeup = self.getNextRecStart() - self.settings['mythps_forerun']
+		stampRecWakeup = self.getNextRecStart() - self.settings['mythps_forerun']
 
 		stampNow = int(time.time())
 
@@ -166,15 +166,15 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: next scheduled daily wake: %s" % time.asctime(time.gmtime(stampDailyWakeup)), level=xbmc.LOGDEBUG)
 				
 			# daily wakeup is before next timer, so set the alarm clock to it
-			if (stampDailyWakeup<stampWakeup) | (stampWakeup < 300000):
+			if (stampDailyWakeup<stampRecWakeup) | (stampRecWakeup < 300000):
 				stampFinalWakeup = stampDailyWakeup
 			else:
-				stampFinalWakeup = stampWakeup
+				stampFinalWakeup = stampRecWakeup
 		else:
-			stampFinalWakeup = stampWakeup
+			stampFinalWakeup = stampRecWakeup
 		
 		# is it in the future and not already set?
-		xbmc.log(msg="mythtv.powersave: next recording: %s" % time.asctime(time.gmtime(stampWakeup)), level=xbmc.LOGDEBUG)
+		xbmc.log(msg="mythtv.powersave: next recording: %s" % time.asctime(time.gmtime(stampRecWakeup)), level=xbmc.LOGDEBUG)
 		xbmc.log(msg="mythtv.powersave: final wake time: %s" % time.asctime(time.gmtime(stampFinalWakeup)), level=xbmc.LOGDEBUG)
 		xbmc.log(msg="mythtv.powersave: time now: %s" % time.asctime(time.gmtime(stampNow)), level=xbmc.LOGDEBUG)
 		xbmc.log(msg="mythtv.powersave: previously set wake at: %s" % time.asctime(time.gmtime(self._lastWakeup)), level=xbmc.LOGDEBUG)
