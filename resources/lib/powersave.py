@@ -190,9 +190,15 @@ class Main:
 			
 	# checks if SafePowerManager is happy, xbmc is playing or we are due to start recording soon.
 	def isBusy(self):
-                busy = (not self._SafePowerManager.okToShutdown() or
-                        xbmc.Player().isPlaying() or
-                        self.getNextRecStart() - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self.getNextRecStart())
+                pm_busy = not self._SafePowerManager.okToShutdown()
+                xbmc_busy = xbmc.Player().isPlaying()
+                rec_starting = self.getNextRecStart() - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self.getNextRecStart() + 60
+
+                xbmc.log(msg="mythtv.powersave: pm_busy: %s" % pm_busy, level=xbmc.LOGDEBUG)
+                xbmc.log(msg="mythtv.powersave: xbmc_busy: %s" % xbmc_busy, level=xbmc.LOGDEBUG)
+                xbmc.log(msg="mythtv.powersave: rec_starting: %s" % rec_starting, level=xbmc.LOGDEBUG)
+
+                busy = pm_busy or xbmc_busy or rec_starting
 
 		return busy
 
