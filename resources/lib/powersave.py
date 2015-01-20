@@ -66,12 +66,11 @@ class Main:
 
 			# now this one is tricky: a playback ended, idle would suggest to powersave, but we set the clock back for overrun. 
 			# Otherwise xbmc could sleep instantly at the end of a movie
-                        isBusy = self.isBusy()
+                        wasBusy, isBusy = isBusy, self.isBusy()
 			if (wasBusy  == True and 
                             isBusy == False and 
                             self._realIdleTime >= self.settings['mythps_sleepmode_after']):
 				self._realIdleTime = self.settings['mythps_sleepmode_after'] - self.settings['mythps_overrun']
-                        wasBusy = isBusy
 
 			xbmc.log(msg="mythtv.powersave: isBusy: %s" % isBusy, level=xbmc.LOGDEBUG)
 			xbmc.log(msg="mythtv.powersave: IdleTime: %d" % self._realIdleTime, level=xbmc.LOGDEBUG)
