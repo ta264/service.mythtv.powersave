@@ -40,7 +40,7 @@ class Main:
 			if (self._MythBackend == False):
 				xbmc.log(msg="mythtv.powersave: Mythbackend not connected - pause/retry", level=xbmc.LOGNOTICE)
 				try:
-                                        connectToMyth()
+                                        self.connectToMyth()
 				except:
 					xbmc.sleep(self._sleep_interval)
 					continue
