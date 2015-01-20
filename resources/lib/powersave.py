@@ -32,7 +32,8 @@ class Main:
 		self._SafePowerManager = SafePowerManager()
                 idleTime = 0
                 lastIdleTime = 0
-                wasBusy = False
+                wasBusy = True
+                isBusy = True
 
 		# main loop
 		while (not xbmc.abortRequested):
