@@ -40,11 +40,7 @@ class Main:
 			if (self._MythBackend == False):
 				xbmc.log(msg="mythtv.powersave: Mythbackend not connected - pause/retry", level=xbmc.LOGNOTICE)
 				try:
-					self._MythDB = MythTV.MythDB(DBHostName = self.settings['mythps_host'],
-								     DBName = self.settings['mythps_dbname'],
-								     DBUserName = self.settings['mythps_dbuser'],
-								     DBPassword = self.settings['mythps_dbpass'])
-					self._MythBackend = MythTV.MythBE(self.settings['mythps_host'], db=self._MythDB)
+                                        connectToMyth()
 				except:
 					xbmc.sleep(self._sleep_interval)
 					continue
@@ -114,6 +110,14 @@ class Main:
 		self.settings['mythps_sleepmode_after'] = self._enum_idle[int(Addon.getSetting('mythps_sleepmode_after'))] * 60
 		self.settings['mythps_dailywakeup'] = Addon.getSetting('mythps_dailywakeup')
 		self.settings['mythps_dailywakeup_time'] = int(Addon.getSetting('mythps_dailywakeup_time')) * 1800
+
+        # connect to mythtv
+        def connectToMyth(self):
+                self._MythDB = MythTV.MythDB(DBHostName = self.settings['mythps_host'],
+                                             DBName = self.settings['mythps_dbname'],
+                                             DBUserName = self.settings['mythps_dbuser'],
+                                             DBPassword = self.settings['mythps_dbpass'])
+                self._MythBackend = MythTV.MythBE(self.settings['mythps_host'], db=self._MythDB)
 
 	# get timers from mythtv
 	def getTimers(self):
