@@ -127,9 +127,10 @@ class Main:
 		try:
 			progs = self._MythBackend.getUpcomingRecordings()
 		except:
+			# Don't change recording.  Set _MythBackend = False so we reconnect
 			self._MythBackend = False
 			xbmc.log(msg="mythtv.powersave: Connection to mythbackend lost!!", level=xbmc.LOGERROR)
-			# Don't change recording
+                        return
 
 		#we need this try in case there are no recordings scheduled
 		try:
