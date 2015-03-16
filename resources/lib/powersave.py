@@ -17,7 +17,8 @@ class Main:
 	_sleep_interval = 2 * 1000
 	# poll timers/shutdown status every 60 seconds
 	_poll_interval = 60 * 1000 / _sleep_interval
-	_nextRecStart = 0
+        _futureTimeStamp = int(time.mktime(time.strptime("2050-01-01", "%Y-%m-%d")))
+	_nextRecStart = _futureTimeStamp
 	_lastSetWakeup = 0
 	_realIdleTime = 0
 	_MythDB = False
@@ -139,9 +140,9 @@ class Main:
 			xbmc.log(msg="mythtv.powersave: next recording is at: %s" % time.strftime("%c", rectime), level=xbmc.LOGDEBUG)
 			self._nextRecStart = time.mktime(rectime)
 		except StopIteration:
-                        # If we don't have a scheduled recording, return 0
+                        # If we don't have a scheduled recording, return a date far in the future
                         xbmc.log(msg="mythtv.powersave: no scheduled recordings", level=xbmc.LOGDEBUG)
-			self._nextRecStart = 0
+			self._nextRecStart = self._futureTimeStamp
 
 		self._SafePowerManager.updateStatus()
 
@@ -179,7 +180,7 @@ class Main:
 		xbmc.log(msg="mythtv.powersave: previously set wake at: %s" % time.asctime(time.gmtime(self._lastSetWakeup)), level=xbmc.LOGDEBUG)
 
                 # Actually set wakeup
-		if (stampFinalWakeup>stampNow) and (stampFinalWakeup != self._lastSetWakeup):
+		if (stampNow < stampFinalWakeup < self._futureTimeStamp) and (stampFinalWakeup != self._lastSetWakeup):
 			xbmc.log(msg="mythtv.powersave: Setting wake up on timestamp %s (%s)" % (stampFinalWakeup, time.asctime(time.gmtime(stampFinalWakeup))), level=xbmc.LOGNOTICE)
 			os.system("%s %d" % (self.settings['mythps_wakecmd'],stampFinalWakeup))
 			self._lastSetWakeup = stampFinalWakeup
