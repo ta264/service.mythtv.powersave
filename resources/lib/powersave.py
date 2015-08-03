@@ -4,7 +4,7 @@ import MythTV
 
 from safePowerManager import SafePowerManager
 
-Addon = xbmcaddon.Addon(id="mythtv.powersave")
+Addon = xbmcaddon.Addon(id="service.mythtv.powersave")
 
 class Main:
 	_base = sys.argv[0]
