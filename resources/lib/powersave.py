@@ -191,13 +191,15 @@ class Main:
 	def isBusy(self):
                 pm_busy = not self._SafePowerManager.okToShutdown()
                 xbmc_busy = xbmc.Player().isPlaying()
+                screensaver_off = xbmc.getCondVisibility('System.ScreenSaverActive') == 0
                 rec_starting = self._nextRecStart - self.settings['mythps_forerun'] - 5 * 60 <= int(time.time()) <= self._nextRecStart + 60
 
                 xbmc.log(msg="mythtv.powersave: pm_busy: %s" % pm_busy, level=xbmc.LOGDEBUG)
                 xbmc.log(msg="mythtv.powersave: xbmc_busy: %s" % xbmc_busy, level=xbmc.LOGDEBUG)
+                xbmc.log(msg="mythtv.powersave: screensaver_off: %s" % screensaver_off, level=xbmc.LOGDEBUG)
                 xbmc.log(msg="mythtv.powersave: rec_starting: %s" % rec_starting, level=xbmc.LOGDEBUG)
 
-                busy = pm_busy or xbmc_busy or rec_starting
+                busy = pm_busy or xbmc_busy or screensaver_off or rec_starting
 
 		return busy
 
